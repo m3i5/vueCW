@@ -21,26 +21,44 @@
   </head>
   <body>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="./lessons.js"></script>
 
     <div id="myApp">
-      <button v-text="swapMessage" @click="showCart" :disabled="!this.cart.length > 0"></button>
+      <button
+        id="backButton"
+        v-text="swapMessage"
+        @click="showCart"
+        :disabled="!this.cart.length > 0"
+      ></button>
 
       <div v-if="displayCart">
         <p>Cart: {{numberOfItems}}</p>
-      </div>
-      <div class="card" v-else>
-        <div class="info">
-          <h3>{{lesson.subject}}</h3>
-          <p>{{lesson.tutor}}</p>
-          <p>{{lesson.location}}</p>
-          <p>{{lesson.price}}</p>
-          <p>Available: {{lesson.quantity}}</p>
-        </div>
-        <img :src="lesson.image" :alt="altText" width="200" />
 
-        <button @click="addToCart(lesson)" :disabled="!canAddToCart">
-          Add
-        </button>
+        <div>
+          <h2>Complete Order</h2>
+        </div>
+        <p>First Name: <input v-model="order.firstName" placeholder="First Name"/></p>
+        <p>Last Name: <input v-model="order.lastName" placeholder="Last Name"/></p>
+        <p>Phone Number: <input v-model="order.phone" placeholder="Phone Number"/></p>
+
+        <button @click="placeOrder" :disabled="!formComplete">Place Order</button>
+      </div>
+
+      <div v-else>
+        <div v-for="(lesson, idx) of lessonArray" class="card" >
+          <div class="info">
+            <h3>{{lesson.subject}}</h3>
+            <p>{{lesson.tutor}}</p>
+            <p>{{lesson.location}}</p>
+            <p>{{lesson.price}}</p>
+            <p>Available: {{lesson.quantity}}</p>
+          </div>
+          <img :src="lesson.image" :alt="altText" width="200" />
+
+          <button @click="addToCart(idx)" :disabled="!canAddToCart(lesson)">
+            Add
+          </button>
+        </div>
       </div>
     </div>
 
@@ -49,33 +67,30 @@
       const myApp = createApp({
         data() {
           return {
-            lesson: {
-              id: "1001",
-              quantity: 10,
-              subject: "Calculus I",
-              tutor: "Isaac Newton",
-              location: "Online",
-              price: "£25",
-              image: "./images/calculus.jpg",
-              altText: "Image of integrals being solved",
-            },
+            lessonArray: lessons,
             cart: [],
             displayCart: false,
             swapMessage: "Checkout",
+            order: {
+              cartContent: [],
+              firstName: "",
+              lastName: "",
+              phone: "",
+            },
           };
         },
         computed: {
           numberOfItems: function () {
             return this.cart.length;
           },
-          canAddToCart: function () {
-            return this.lesson.quantity > 0 ? true : false;
-          },
+          formComplete: function () {
+            return this.order.firstName && this.order.lastName && this.order.phone
+          }
         },
         methods: {
-          addToCart(lesson) {
-            this.cart.push(lesson.id);
-            this.lesson.quantity--;
+          addToCart(index) {
+            this.cart.push(this.lessonArray[index].id);
+            this.lessonArray[index].quantity--;
             console.log(this.canAddToCart);
           },
           showCart() {
@@ -84,6 +99,14 @@
               ? (this.swapMessage = "Go back")
               : (this.swapMessage = "Checkout");
           },
+          canAddToCart(lesson) {
+            return lesson.quantity > 0 ? true : false;
+          },
+          placeOrder(order) {
+            alert("Order has been placed!")
+            this.cart = [];
+            document.getElementById('backButton').click();
+          }
         },
       });
 
@@ -91,3 +114,4 @@
     </script>
   </body>
 </html>
+
