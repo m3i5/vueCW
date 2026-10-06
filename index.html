@@ -6,40 +6,42 @@
     <title>Document</title>
 
     <style>
-        .card {
-            margin: auto;
-            width: 450px;
-            top:50%;
-            padding: 20px;
-            border: 2px solid blue;
-            
-            display: flex;
-            flex-direction: row;
-            justify-content: space-around;
-        }
+      .card {
+        margin: auto;
+        width: 450px;
+        top: 50%;
+        padding: 20px;
+        border: 2px solid blue;
+
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+      }
     </style>
   </head>
   <body>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-
     <div id="myApp">
-      <div>
-        <p>Cart: {{cartQuantity}}</p>
+      <button v-text="swapMessage" @click="showCart" :disabled="!this.cart.length > 0"></button>
+
+      <div v-if="displayCart">
+        <p>Cart: {{numberOfItems}}</p>
       </div>
-      <div class="card">
+      <div class="card" v-else>
         <div class="info">
-            <h3>{{lesson.subject}}</h3>
-            <p>{{lesson.tutor}}</p>
-            <p>{{lesson.location}}</p>
-            <p>{{lesson.price}}</p>
-            <p>Available: {{lesson.quantity}}</p>
+          <h3>{{lesson.subject}}</h3>
+          <p>{{lesson.tutor}}</p>
+          <p>{{lesson.location}}</p>
+          <p>{{lesson.price}}</p>
+          <p>Available: {{lesson.quantity}}</p>
         </div>
         <img :src="lesson.image" :alt="altText" width="200" />
 
-        <button @click="addToCart(lesson)" :disabled="!canAddToCart">Add</button>
+        <button @click="addToCart(lesson)" :disabled="!canAddToCart">
+          Add
+        </button>
       </div>
-
     </div>
 
     <script type="module">
@@ -58,23 +60,31 @@
               altText: "Image of integrals being solved",
             },
             cart: [],
+            displayCart: false,
+            swapMessage: "Checkout",
           };
         },
         computed: {
-          cartQuantity: function() {
-            return this.cart.length
+          numberOfItems: function () {
+            return this.cart.length;
           },
-          canAddToCart: function() {
+          canAddToCart: function () {
             return this.lesson.quantity > 0 ? true : false;
-          }
+          },
         },
         methods: {
           addToCart(lesson) {
             this.cart.push(lesson.id);
             this.lesson.quantity--;
-            console.log(this.canAddToCart)
-          }
-        }
+            console.log(this.canAddToCart);
+          },
+          showCart() {
+            this.displayCart = !this.displayCart;
+            this.swapMessage == "Checkout"
+              ? (this.swapMessage = "Go back")
+              : (this.swapMessage = "Checkout");
+          },
+        },
       });
 
       myApp.mount("#myApp");
