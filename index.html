@@ -21,19 +21,25 @@
   </head>
   <body>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
 
     <div id="myApp">
+      <div>
+        <p>Cart: {{cartQuantity}}</p>
+      </div>
       <div class="card">
         <div class="info">
-            <h3>{{module.subject}}</h3>
-            <p>{{module.tutor}}</p>
-            <p>{{module.location}}</p>
-            <p>{{module.price}}</p>
+            <h3>{{lesson.subject}}</h3>
+            <p>{{lesson.tutor}}</p>
+            <p>{{lesson.location}}</p>
+            <p>{{lesson.price}}</p>
+            <p>Available: {{lesson.quantity}}</p>
         </div>
-       
-        <img :src="module.image" :alt="altText" width="200" />
+        <img :src="lesson.image" :alt="altText" width="200" />
+
+        <button @click="addToCart(lesson)" :disabled="!canAddToCart">Add</button>
       </div>
+
     </div>
 
     <script type="module">
@@ -41,16 +47,34 @@
       const myApp = createApp({
         data() {
           return {
-            module: {
+            lesson: {
+              id: "1001",
+              quantity: 10,
               subject: "Calculus I",
               tutor: "Isaac Newton",
               location: "Online",
               price: "£25",
               image: "./images/calculus.jpg",
-              altText: "Image of integrals being solved"
+              altText: "Image of integrals being solved",
             },
+            cart: [],
           };
         },
+        computed: {
+          cartQuantity: function() {
+            return this.cart.length
+          },
+          canAddToCart: function() {
+            return this.lesson.quantity > 0 ? true : false;
+          }
+        },
+        methods: {
+          addToCart(lesson) {
+            this.cart.push(lesson.id);
+            this.lesson.quantity--;
+            console.log(this.canAddToCart)
+          }
+        }
       });
 
       myApp.mount("#myApp");
